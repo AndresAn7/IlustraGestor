@@ -12,11 +12,18 @@ public class RegistroFacturacion {
     
     private int facturasEmitidas;
     private double totalFacturado;
-    
+    private int ultimoIdFactura;
+
+    public synchronized int siguienteIdFactura() {
+        ultimoIdFactura++;
+        return ultimoIdFactura;
+    }
+
     public synchronized void registrarFactura(double total) {
         facturasEmitidas++;
         totalFacturado += total;
     }
+
     public synchronized int getFacturasEmitidas() {
         return facturasEmitidas;
     }
@@ -28,6 +35,6 @@ public class RegistroFacturacion {
     public synchronized void reiniciar() {
         facturasEmitidas = 0;
         totalFacturado = 0;
-    }    
-     
+        ultimoIdFactura = 0;
+    }
 }
