@@ -10,6 +10,11 @@ import com.poo.ilustragestor.modelo.EstadoEncargo;
 import com.poo.ilustragestor.modelo.Factura;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -39,6 +44,36 @@ public class ProcesadorFacturas {
         }
         return facturas;
     }
+    
+    public List<Factura> facturarEnParalelo(List<Cliente> clientes, int numeroHilos)
+        throws InterruptedException {
+    registro.reiniciar();
+
+    ExecutorService pool = Executors.newFixedThreadPool(numeroHilos);
+    List<Future<Factura>> pendientes = new ArrayList<>();
+
+    try {
+        for (Cliente c : clientes) {
+            Callable<Factura> tarea = () -> facturarCliente(c);
+            pendientes.add(pool.submit(tarea));
+        }
+
+        List<Factura> facturas = new ArrayList<>();
+        for (Future<Factura> futuro : pendientes) {
+            try {
+                Factura f = futuro.get();
+                if (f != null) {
+                    facturas.add(f);
+                }
+            } catch (ExecutionException e) {
+                System.out.println("  Error facturando: " + e.getCause().getMessage());
+            }
+        }
+        return facturas;
+    } finally {
+        pool.shutdown();
+    }
+}
 
     private Factura facturarCliente(Cliente cliente) {
         List<Encargo> entregados = new ArrayList<>();
