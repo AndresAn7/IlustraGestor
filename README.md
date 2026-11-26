@@ -9,13 +9,12 @@ puede tardar, así que paralelizarlo ayuda.
 
 ## Tipo de concurrencia: ExecutorService
 
-Creamos un pool de 4 hilos y le mandamos una tarea por cada cliente. Cuando un hilo
+Creé un pool de 4 hilos y le mandamos una tarea por cada cliente. Cuando un hilo
 termina, agarra la siguiente tarea.
 
-Lo escogí porque:
-- Hay muchas tareas y el pool reutiliza los hilos en vez de crear uno nuevo cada vez.
-- Cada tarea devuelve una factura, y con Runnable eso no se puede.
-- La tabla de la clase lo recomienda para muchas tareas.
+Lo escogí porque primero, hay muchas tareas y el pool reutiliza los hilos en vez de crear uno nuevo cada vez.
+Segundo, cada tarea devuelve una factura, y con Runnable eso no se puede.
+Tercero, la tabla de la clase lo recomienda para muchas tareas.
 
 Lo malo es que hay que cerrar el pool, por eso usamos `shutdown()` en un `finally`.
 
