@@ -5,6 +5,7 @@
 package com.poo.ilustragestor;
 
 import com.poo.ilustragestor.modelo.*;
+import com.poo.ilustragestor.servicio.DemoConcurrencia;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDate;
@@ -75,6 +76,10 @@ public static void main(String[] args) {
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
+        
+        System.out.println("\n--- 8. Concurrencia: facturación masiva ---");
+        DemoConcurrencia.ejecutar();
+        
         try {
             andrea.setCorreo("sin-arroba");
         } catch (IllegalArgumentException e) {

@@ -18,7 +18,42 @@ public class DemoConcurrencia {
     private static final int NUM_CLIENTES = 8;
     private static final int NUM_HILOS = 4;
     private static final long LATENCIA_MS = 300;
+    
+    public static void ejecutar() {
+    List<Cliente> clientes = crearClientesConEncargosEntregados();
+    ProcesadorFacturas procesador = new ProcesadorFacturas(LATENCIA_MS);
 
+    System.out.println("Clientes a facturar: " + clientes.size()
+            + " | hilos del pool: " + NUM_HILOS);
+
+    System.out.println("\n>> Facturación SECUENCIAL");
+    long inicioSecuencial = System.nanoTime();
+    procesador.facturarSecuencial(clientes);
+    long msSecuencial = (System.nanoTime() - inicioSecuencial) / 1_000_000;
+    double totalSecuencial = procesador.getRegistro().getTotalFacturado();
+
+    System.out.println("\n>> Facturación CONCURRENTE (ExecutorService)");
+    long inicioParalelo = System.nanoTime();
+    List<Factura> facturas;
+    try {
+        facturas = procesador.facturarEnParalelo(clientes, NUM_HILOS);
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        System.out.println("Facturación interrumpida.");
+        return;
+    }
+    long msParalelo = (System.nanoTime() - inicioParalelo) / 1_000_000;
+    double totalParalelo = procesador.getRegistro().getTotalFacturado();
+
+    System.out.println("\n--- Resultados ---");
+    System.out.println("Facturas emitidas: " + facturas.size());
+    System.out.println("Tiempo secuencial: " + msSecuencial + " ms");
+    System.out.println("Tiempo concurrente: " + msParalelo + " ms");
+    System.out.println("Total secuencial: " + totalSecuencial
+            + " | Total concurrente: " + totalParalelo
+            + " | coinciden: " + (totalSecuencial == totalParalelo));
+}
+    
 private static List<Cliente> crearClientesConEncargosEntregados() {
     Ilustrador ilustrador = new Ilustrador(900, "Equipo de ilustración", "General", 1000);
     LocalDate entrega = LocalDate.now().plusDays(10);
